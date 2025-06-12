@@ -15,6 +15,7 @@ class FuelDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "fuel_db"
                 liters REAL,
                 kilometers REAL,
                 consumption REAL,
+                fuel_price INTEGER,
                 timestamp INTEGER
             )
         """.trimIndent()
@@ -32,6 +33,7 @@ class FuelDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "fuel_db"
             put("liters", entry.liters)
             put("kilometers", entry.kilometers)
             put("consumption", entry.consumption)
+            put("fuel_price", entry.fuelPrice)
             put("timestamp", entry.timestamp)
         }
         return db.insert("fuel_entries", null, values)
@@ -47,8 +49,9 @@ class FuelDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "fuel_db"
             val liters = cursor.getDouble(cursor.getColumnIndexOrThrow("liters"))
             val kilometers = cursor.getDouble(cursor.getColumnIndexOrThrow("kilometers"))
             val consumption = cursor.getDouble(cursor.getColumnIndexOrThrow("consumption"))
+            val fuelPrice = cursor.getInt(cursor.getColumnIndexOrThrow("fuel_price"))
             val timestamp = cursor.getLong(cursor.getColumnIndexOrThrow("timestamp"))
-            entries.add(FuelEntry(liters, kilometers, consumption, timestamp, id))
+            entries.add(FuelEntry(liters, kilometers, consumption, fuelPrice, timestamp, id))
         }
 
         cursor.close()

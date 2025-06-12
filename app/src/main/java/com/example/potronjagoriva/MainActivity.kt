@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var editLiters: EditText
     private lateinit var editKilometers: EditText
+    private lateinit var editFuelPrice: EditText
     private lateinit var addButton: Button
     private lateinit var recyclerView: RecyclerView
     private lateinit var exportButton: Button
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         editLiters = findViewById(R.id.edit_liters)
         editKilometers = findViewById(R.id.edit_kilometers)
+        editFuelPrice = findViewById(R.id.edit_fuel_price)
         addButton = findViewById(R.id.add_button)
         recyclerView = findViewById(R.id.recycler_view)
         exportButton = findViewById(R.id.export_button)
@@ -67,17 +69,19 @@ class MainActivity : AppCompatActivity() {
         addButton.setOnClickListener {
             val litersText = editLiters.text.toString()
             val kmText = editKilometers.text.toString()
+            val fuelPriceText = editFuelPrice.text.toString()
 
-            if (litersText.isNotBlank() && kmText.isNotBlank()) {
+            if (litersText.isNotBlank() && kmText.isNotBlank() && fuelPriceText.isNotBlank()) {
                 val liters = litersText.toDoubleOrNull()
                 val km = kmText.toDoubleOrNull()
+                val fuelPrice = fuelPriceText.toIntOrNull()
 
-                if (liters != null && km != null && km > 0) {
+                if (liters != null && km != null && fuelPrice != null && km > 0) {
                     val consumption = (liters / km) * 100
                     val timestamp = System.currentTimeMillis()
-                    val entry = FuelEntry(liters, km, consumption, timestamp)
+                    val entry = FuelEntry(liters, km, consumption, fuelPrice, timestamp)
                     val id = dbHelper.insertEntry(entry)
-                    entries.add(0, entry.copy(id = id)) // ID iz baze
+                    entries.add(0, entry.copy(id = id))
                     adapter.notifyItemInserted(0)
                     recyclerView.scrollToPosition(0)
                     editLiters.text.clear()
@@ -111,7 +115,7 @@ class MainActivity : AppCompatActivity() {
 
         paint.textSize = 14f
 
-        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create() // A4
+        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
         val page = pdfDocument.startPage(pageInfo)
         val canvas = page.canvas
 
@@ -122,12 +126,14 @@ class MainActivity : AppCompatActivity() {
         val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
 
         entries.forEachIndexed { index, entry ->
-            val line = "${index + 1}. L: %.2f | Km: %.2f | %.2f l/100km | %s".format(
-                entry.liters,
-                entry.kilometers,
-                entry.consumption,
-                sdf.format(Date(entry.timestamp))
-            )
+            val line =
+                "${index + 1}. %s | L: %.2f | Km: %.2f | Cena: %d RSD | Potrošnja: %.2f l/100km".format(
+                    sdf.format(Date(entry.timestamp)),
+                    entry.liters,
+                    entry.kilometers,
+                    entry.fuelPrice,
+                    entry.consumption
+                )
 
             if (y > 800f) {
                 pdfDocument.finishPage(page)

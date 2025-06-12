@@ -21,6 +21,14 @@
         android:hint="Unesi kilometre"
         android:inputType="numberDecimal" />
 
+    <EditText
+        android:id="@+id/edit_fuel_price"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Unesi cenu goriva"
+        android:inputType="number" />
+
     <Button
         android:id="@+id/add_button"
         android:layout_width="match_parent"

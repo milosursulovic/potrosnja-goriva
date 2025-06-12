@@ -33,8 +33,8 @@ class FuelAdapter(
         val dateStr = sdf.format(java.util.Date(entry.timestamp))
 
         holder.infoText.text = String.format(
-            "L: %.2f | Km: %.2f | %.2f l/100km\n%s",
-            entry.liters, entry.kilometers, entry.consumption, dateStr
+            "%s | L: %.2f | Km: %.2f | Cena: %d RSD | Potrošnja: %.2f l/100km",
+            dateStr, entry.liters, entry.kilometers, entry.fuelPrice, entry.consumption
         )
 
         holder.deleteBtn.setOnClickListener {

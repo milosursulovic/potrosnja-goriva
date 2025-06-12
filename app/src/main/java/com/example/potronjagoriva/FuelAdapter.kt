@@ -1,0 +1,44 @@
+package com.example.potronjagoriva
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+
+class FuelAdapter(
+    private val entries: List<FuelEntry>,
+    private val onDeleteClick: (FuelEntry) -> Unit
+) : RecyclerView.Adapter<FuelAdapter.FuelViewHolder>() {
+    class FuelViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val infoText: TextView = view.findViewById(R.id.info_text)
+        val deleteBtn: ImageButton = view.findViewById(R.id.delete_btn)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FuelViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_fuel_entry, parent, false)
+
+        return FuelViewHolder(view)
+    }
+
+    override fun getItemCount(): Int {
+        return entries.size
+    }
+
+    override fun onBindViewHolder(holder: FuelViewHolder, position: Int) {
+        val entry = entries[position]
+        val sdf = java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault())
+        val dateStr = sdf.format(java.util.Date(entry.timestamp))
+
+        holder.infoText.text = String.format(
+            "L: %.2f | Km: %.2f | %.2f l/100km\n%s",
+            entry.liters, entry.kilometers, entry.consumption, dateStr
+        )
+
+        holder.deleteBtn.setOnClickListener {
+            onDeleteClick(entry)
+        }
+    }
+}

@@ -138,6 +138,13 @@ class MainActivity : AppCompatActivity() {
             y += 22f
         }
 
+        val totalFuel = dbHelper.getTotalFuel()
+
+        y += 30f
+        paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        paint.textSize = 16f
+        canvas.drawText("Ukupna potrošnja goriva: %.2f L".format(totalFuel), 30f, y, paint)
+
         pdfDocument.finishPage(page)
 
         val filename = "Potrosnja_${System.currentTimeMillis()}.pdf"

@@ -86,6 +86,7 @@ class MainActivity : AppCompatActivity() {
                     recyclerView.scrollToPosition(0)
                     editLiters.text.clear()
                     editKilometers.text.clear()
+                    editFuelPrice.text.clear()
                 } else {
                     Toast.makeText(this, "Unesite validne brojeve.", Toast.LENGTH_SHORT).show()
                 }

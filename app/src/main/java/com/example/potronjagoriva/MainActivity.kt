@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var addButton: Button
     private lateinit var recyclerView: RecyclerView
     private lateinit var exportButton: Button
+    private lateinit var editDate: EditText
 
     private val entries = mutableListOf<FuelEntry>()
     private lateinit var adapter: FuelAdapter
@@ -50,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         addButton = findViewById(R.id.add_button)
         recyclerView = findViewById(R.id.recycler_view)
         exportButton = findViewById(R.id.export_button)
+        editDate = findViewById(R.id.edit_date)
 
         dbHelper = FuelDatabaseHelper(this)
         entries.addAll(dbHelper.getAllEntries())
@@ -78,7 +80,18 @@ class MainActivity : AppCompatActivity() {
 
                 if (liters != null && km != null && fuelPrice != null && km > 0) {
                     val consumption = (liters / km) * 100
-                    val timestamp = System.currentTimeMillis()
+                    val dateText = editDate.text.toString()
+                    val timestamp = if (dateText.isNotBlank()) {
+                        try {
+                            val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                            sdf.parse(dateText)?.time ?: System.currentTimeMillis()
+                        } catch (e: Exception) {
+                            System.currentTimeMillis()
+                        }
+                    } else {
+                        System.currentTimeMillis()
+                    }
+
                     val entry = FuelEntry(liters, km, consumption, fuelPrice, timestamp)
                     val id = dbHelper.insertEntry(entry)
                     entries.add(0, entry.copy(id = id))
@@ -87,12 +100,27 @@ class MainActivity : AppCompatActivity() {
                     editLiters.text.clear()
                     editKilometers.text.clear()
                     editFuelPrice.text.clear()
+                    editDate.text.clear()
                 } else {
                     Toast.makeText(this, "Unesite validne brojeve.", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 Toast.makeText(this, "Popunite oba polja.", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        editDate.setOnClickListener {
+            val calendar = java.util.Calendar.getInstance()
+            val year = calendar.get(java.util.Calendar.YEAR)
+            val month = calendar.get(java.util.Calendar.MONTH)
+            val day = calendar.get(java.util.Calendar.DAY_OF_MONTH)
+
+            val datePicker = android.app.DatePickerDialog(this, { _, y, m, d ->
+                val formattedDate = String.format("%02d.%02d.%04d", d, m + 1, y)
+                editDate.setText(formattedDate)
+            }, year, month, day)
+
+            datePicker.show()
         }
 
         exportButton.setOnClickListener {

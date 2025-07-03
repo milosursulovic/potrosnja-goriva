@@ -154,14 +154,25 @@ class MainActivity : AppCompatActivity() {
 
         val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
 
+        var totalFuel = 0.0
+        var totalKilometers = 0.0
+        var totalCost = 0.0
+        var totalConsumption = 0.0
+
+        val firstDate =
+            entries.minByOrNull { it.timestamp }?.timestamp ?: System.currentTimeMillis()
+        val lastDate = entries.maxByOrNull { it.timestamp }?.timestamp ?: System.currentTimeMillis()
+
         entries.forEachIndexed { index, entry ->
+            val cost = entry.liters * entry.fuelPrice
             val line =
-                "${index + 1}. %s | L: %.2f | Km: %.2f | Cena: %d RSD | Potrošnja: %.2f l/100km".format(
+                "${index + 1}. %s | L: %.2f | Km: %.2f | Cena: %d RSD | Potrošnja: %.2f | Plaćeno: %.2f RSD".format(
                     sdf.format(Date(entry.timestamp)),
                     entry.liters,
                     entry.kilometers,
                     entry.fuelPrice,
-                    entry.consumption
+                    entry.consumption,
+                    cost
                 )
 
             if (y > 800f) {
@@ -171,14 +182,47 @@ class MainActivity : AppCompatActivity() {
 
             canvas.drawText(line, 30f, y, paint)
             y += 22f
+
+            totalFuel += entry.liters
+            totalKilometers += entry.kilometers
+            totalConsumption += entry.consumption
+            totalCost += cost
         }
 
-        val totalFuel = dbHelper.getTotalFuel()
+        // Računanje proseka
+        val averagePricePerLiter = if (totalFuel > 0) totalCost / totalFuel else 0.0
+        val averageConsumption = if (entries.isNotEmpty()) totalConsumption / entries.size else 0.0
 
         y += 30f
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         paint.textSize = 16f
-        canvas.drawText("Ukupna potrošnja goriva: %.2f L".format(totalFuel), 30f, y, paint)
+
+        canvas.drawText(
+            "Za period ${sdf.format(Date(firstDate))} - ${sdf.format(Date(lastDate))}",
+            30f,
+            y,
+            paint
+        )
+        y += 22f
+        canvas.drawText("Ukupno sipano: %.2f L".format(totalFuel), 30f, y, paint)
+        y += 22f
+        canvas.drawText("Ukupno pređeno: %.2f km".format(totalKilometers), 30f, y, paint)
+        y += 22f
+        canvas.drawText(
+            "Prosečna cena po litru: %.2f RSD".format(averagePricePerLiter),
+            30f,
+            y,
+            paint
+        )
+        y += 22f
+        canvas.drawText(
+            "Prosečna potrošnja: %.2f l/100km".format(averageConsumption),
+            30f,
+            y,
+            paint
+        )
+        y += 22f
+        canvas.drawText("Ukupno potrošeno novca: %.2f RSD".format(totalCost), 30f, y, paint)
 
         pdfDocument.finishPage(page)
 
@@ -197,4 +241,5 @@ class MainActivity : AppCompatActivity() {
 
         pdfDocument.close()
     }
+
 }

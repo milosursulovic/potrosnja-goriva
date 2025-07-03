@@ -31,14 +31,21 @@ class FuelAdapter(
         val entry = entries[position]
         val sdf = java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault())
         val dateStr = sdf.format(java.util.Date(entry.timestamp))
+        val cost = entry.liters * entry.fuelPrice
 
         holder.infoText.text = String.format(
-            "%s | L: %.2f | Km: %.2f | Cena: %d RSD | Potrošnja: %.2f l/100km",
-            dateStr, entry.liters, entry.kilometers, entry.fuelPrice, entry.consumption
+            "%s\nL: %.2f | Km: %.2f | Cena: %d RSD | Potrošnja: %.2f l/100km | Plaćeno: %.2f RSD",
+            dateStr,
+            entry.liters,
+            entry.kilometers,
+            entry.fuelPrice,
+            entry.consumption,
+            cost
         )
 
         holder.deleteBtn.setOnClickListener {
             onDeleteClick(entry)
         }
     }
+
 }

@@ -12,7 +12,9 @@ class FuelAdapter(
     private val onDeleteClick: (FuelEntry) -> Unit
 ) : RecyclerView.Adapter<FuelAdapter.FuelViewHolder>() {
     class FuelViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val dateText: TextView = view.findViewById(R.id.date_text)
         val infoText: TextView = view.findViewById(R.id.info_text)
+        val extraText: TextView = view.findViewById(R.id.extra_text)
         val deleteBtn: ImageButton = view.findViewById(R.id.delete_btn)
     }
 
@@ -33,19 +35,16 @@ class FuelAdapter(
         val dateStr = sdf.format(java.util.Date(entry.timestamp))
         val cost = entry.liters * entry.fuelPrice
 
-        holder.infoText.text = String.format(
-            "%s\nL: %.2f | Km: %.2f | Cena: %d RSD | Potrošnja: %.2f l/100km | Plaćeno: %.2f RSD",
-            dateStr,
-            entry.liters,
-            entry.kilometers,
-            entry.fuelPrice,
-            entry.consumption,
-            cost
+        holder.dateText.text = dateStr
+        holder.infoText.text = "L: %.2f | Km: %.2f | Cena: %d RSD".format(
+            entry.liters, entry.kilometers, entry.fuelPrice
+        )
+        holder.extraText.text = "Potrošnja: %.2f l/100km | Plaćeno: %.2f RSD".format(
+            entry.consumption, cost
         )
 
         holder.deleteBtn.setOnClickListener {
             onDeleteClick(entry)
         }
     }
-
 }
